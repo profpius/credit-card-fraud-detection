@@ -443,15 +443,20 @@ with tab1:
                0.133558376740387, -0.021053053]
     }
 
-    # Determine defaults
+    # Persist sample selection across rerenders using session_state
     if load_fraud:
-        defaults = FRAUD_SAMPLE
-        st.info("⚠️ Loaded a known fraudulent transaction sample from the dataset.")
+        st.session_state["sample"] = FRAUD_SAMPLE
+        st.session_state["sample_type"] = "fraud"
     elif load_legit:
-        defaults = LEGIT_SAMPLE
+        st.session_state["sample"] = LEGIT_SAMPLE
+        st.session_state["sample_type"] = "legit"
+
+    defaults = st.session_state.get("sample", None)
+
+    if st.session_state.get("sample_type") == "fraud":
+        st.info("⚠️ Loaded a known fraudulent transaction sample from the dataset.")
+    elif st.session_state.get("sample_type") == "legit":
         st.success("✅ Loaded a known legitimate transaction sample from the dataset.")
-    else:
-        defaults = None
 
     def dv(key, default=0.0):
         """Get default value for a field."""
