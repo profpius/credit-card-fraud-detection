@@ -299,8 +299,21 @@ def load_pipeline():
 
 pipeline = load_pipeline()
 
-# Feature column names (standard Kaggle fraud dataset)
-FEATURE_COLS = ["time_scaled"] + [f"v{i}" for i in range(1, 29)] + ["amount_scaled"]
+@st.cache_resource
+def load_scaler():
+    try:
+        return joblib.load("scaler.pkl")
+    except FileNotFoundError:
+        st.error("❌ `scaler.pkl` not found. Make sure it's in the same directory as `app.py`.")
+        st.stop()
+    except Exception as e:
+        st.error(f"❌ Failed to load scaler: {e}")
+        st.stop()
+
+scaler = load_scaler()
+
+# Feature column names — must match model's training features exactly
+FEATURE_COLS = [f"v{i}" for i in range(1, 29)] + ["hour", "amount_scaled", "time_scaled"]
 
 
 # ── Hero Section ───────────────────────────────────────────────────────────────
@@ -498,15 +511,20 @@ with tab1:
         predict_clicked = st.button("🔍  ANALYZE TRANSACTION")
 
     if predict_clicked:
+        # Derive hour and scale time/amount to match training
+        hour          = int((time_val % 86400) // 3600)
+        time_scaled   = (time_val - 94811.07759952) / 47480.96421642
+        amount_scaled = scaler.transform([[amount]])[0][0]
+
         features = np.array([[
-            time_val, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10,
+            v1, v2, v3, v4, v5, v6, v7, v8, v9, v10,
             v11, v12, v13, v14, v15, v16, v17, v18, v19, v20,
-            v21, v22, v23, v24, v25, v26, v27, v28, amount
+            v21, v22, v23, v24, v25, v26, v27, v28,
+            hour, amount_scaled, time_scaled
         ]])
 
-
         try:
-            input_df = pd.DataFrame(features, columns=FEATURE_COLS)
+            input_df    = pd.DataFrame(features, columns=FEATURE_COLS)
             prediction  = pipeline.predict(input_df)[0]
             probability = pipeline.predict_proba(input_df)[0][1]
         except Exception as e:
