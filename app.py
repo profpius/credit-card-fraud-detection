@@ -531,7 +531,7 @@ with tab1:
         if defaults is not None and "amount_scaled" in defaults:
             amount_scaled = defaults["amount_scaled"]
         else:
-            amount_scaled = scaler.transform([[amount]])[0][0]
+            amount_scaled = (amount - 88.47268731099723) / 250.39899584557298
 
         features = np.array([[
             v1, v2, v3, v4, v5, v6, v7, v8, v9, v10,
@@ -717,7 +717,7 @@ with tab2:
                 df_input = df_raw.copy()
                 df_input["hour"]          = (df_input["time"] % 86400 // 3600).astype(int)
                 df_input["time_scaled"]   = (df_input["time"] - TIME_MEAN) / TIME_STD
-                df_input["amount_scaled"] = scaler.transform(df_input[["amount"]])
+                df_input["amount_scaled"] = (df_input["amount"] - 88.47268731099723) / 250.39899584557298
                 df_input = df_input[FEATURE_COLS]
 
                 try:
