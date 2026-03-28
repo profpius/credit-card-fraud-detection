@@ -763,7 +763,7 @@ with tab2:
 
                 # Full results table
                 st.markdown('<div class="section-header">Transaction-Level Results</div>', unsafe_allow_html=True)
-                display_cols = ["Time", "Amount", "Fraud_Probability", "Prediction", "Result"]
+                display_cols = ["time", "amount", "Fraud_Probability", "Prediction", "Result"]
                 st.dataframe(
                     df_results[display_cols].style.applymap(
                         lambda v: "color: #ef4444; font-weight: bold" if v == 1 else "color: #22c55e",
