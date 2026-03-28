@@ -117,6 +117,10 @@ The default 0.5 decision threshold optimises for accuracy, not recall. Using the
 
 **93.8% precision** means that nearly 94 out of every 100 flagged transactions are genuine fraud, keeping investigation workload manageable while the improved recall ensures fewer real cases slip through.
 
+### Out-of-Sample Validation
+
+When tested on a held-out sample of **5,000 real transactions** containing **287 confirmed fraud cases**, the model detected **273 of them** — a real-world recall of **95.1%**, exceeding the tuned threshold recall and confirming the model generalises well beyond the training set.
+
 ### Why These Metrics Matter for Fraud
 
 | Metric | Business Meaning |
@@ -235,13 +239,16 @@ credit-card-fraud-detection/
 │   └── shap_dependence.png                 # Dependence plots for v14 and v4
 │
 ├── 🌐 app.py                               # Streamlit web application
-├── 🤖 fraud_pipeline.pkl                   # Trained XGBoost pipeline (Scaler + Model)
+├── 🤖 fraud_pipeline.pkl                   # Trained XGBoost model pipeline
+├── ⚖️ scaler.pkl                           # StandardScaler fitted on Time feature
 ├── 📄 requirements.txt                     # Python dependencies
 ├── 📄 README.md                            # This file
 └── 📄 LICENSE                              # MIT License
 ```
 
 > **Note:** `creditcard.csv` is not included in this repository due to file size. Download it from [Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) and place it in the root directory before running the notebook.
+
+> **⚠️ Batch CSV Compatibility:** The batch upload feature requires CSV files from the same Kaggle creditcard dataset. The V1–V28 features are PCA components specific to this dataset — CSVs from other sources will not produce meaningful predictions since the feature distributions will not match.
 
 ---
 
