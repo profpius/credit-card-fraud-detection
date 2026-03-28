@@ -686,7 +686,7 @@ with tab2:
     Upload a CSV file of transactions for bulk fraud detection.
     The CSV must contain these columns (in any order):
     """)
-    st.code("Time, V1, V2, V3, ..., V28, Amount", language="text")
+    st.code("Time, v1, v2, v3, ..., v28, Amount", language="text")
     st.caption("The `Class` column is optional — if present it will be ignored during prediction.")
 
     uploaded_file = st.file_uploader("Drop your CSV file here", type=["csv"])
@@ -694,6 +694,7 @@ with tab2:
     if uploaded_file is not None:
         try:
             df_raw = pd.read_csv(uploaded_file)
+            df_raw.columns = df_raw.columns.str.lower()
         except Exception as e:
             st.error(f"Could not read CSV: {e}")
             st.stop()
@@ -701,17 +702,23 @@ with tab2:
         st.markdown(f"**Preview — {len(df_raw):,} transactions loaded**")
         st.dataframe(df_raw.head(5), use_container_width=True)
 
-        # Check required columns
-        missing = [c for c in FEATURE_COLS if c not in df_raw.columns]
+        raw_required = [f"v{i}" for i in range(1, 29)] + ["time", "amount"]
+        missing = [c for c in raw_required if c not in df_raw.columns]
         if missing:
-            st.error(f"❌ Missing columns: `{missing}`. Your CSV must include Time, V1–V28, and Amount.")
+            st.error(f"❌ Missing columns: `{missing}`. Your CSV must include Time, v1–v28, and Amount.")
         else:
             run_col, _ = st.columns([1, 2])
             with run_col:
                 run_batch = st.button("🔍  RUN BATCH PREDICTION")
 
             if run_batch:
-                df_input = df_raw[FEATURE_COLS].copy()
+                TIME_MEAN = 94811.07759952
+                TIME_STD  = 47480.96421642
+                df_input = df_raw.copy()
+                df_input["hour"]          = (df_input["time"] % 86400 // 3600).astype(int)
+                df_input["time_scaled"]   = (df_input["time"] - TIME_MEAN) / TIME_STD
+                df_input["amount_scaled"] = scaler.transform(df_input[["amount"]])
+                df_input = df_input[FEATURE_COLS]
 
                 try:
                     preds = pipeline.predict(df_input)
