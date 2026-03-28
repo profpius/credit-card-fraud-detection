@@ -300,7 +300,7 @@ def load_pipeline():
 pipeline = load_pipeline()
 
 # Feature column names (standard Kaggle fraud dataset)
-FEATURE_COLS = ["Time"] + [f"V{i}" for i in range(1, 29)] + ["Amount"]
+FEATURE_COLS = ["time"] + [f"v{i}" for i in range(1, 29)] + ["amount"]
 
 
 # ── Hero Section ───────────────────────────────────────────────────────────────
