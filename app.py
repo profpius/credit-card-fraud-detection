@@ -422,7 +422,7 @@ with tab1:
 
     # Known sample values from the Kaggle dataset
     FRAUD_SAMPLE = {
-        "time": 406.0, "amount": 2.69,
+        "time": 406.0, "amount_scaled": -0.353326845470101, "hour": 0,
         "v": [-2.312226542, 1.95199201064158, -1.609850732, 3.9979055875468,
               -0.522187865, -1.426545319, -2.537387306, 1.39165724829804,
               -2.770089277, -2.772272145, 3.20203320709635, -2.899907388,
@@ -432,7 +432,7 @@ with tab1:
                0.0445191674731724, 0.177839798284401, 0.261145002567677, -0.143275875]
     }
     LEGIT_SAMPLE = {
-        "time": 0.0, "amount": 149.62,
+        "time": 0.0, "amount_scaled": 0.24419951239226925, "hour": 0,
         "v": [-1.359807134, -0.072781173, 2.53634673796914, 1.37815522427443,
               -0.33832077, 0.462387777762292, 0.239598554061257, 0.0986979012610507,
                0.363786969611213, 0.0907941719789316, -0.551599533, -0.617800856,
@@ -460,7 +460,7 @@ with tab1:
         if key == "time":
             return defaults["time"]
         if key == "amount":
-            return defaults["amount"]
+            return defaults.get("amount", 0.0)
         if key.startswith("v"):
             idx = int(key[1:]) - 1
             return defaults["v"][idx]
@@ -519,9 +519,14 @@ with tab1:
 
     if predict_clicked:
         # Derive hour and scale time/amount to match training
-        hour          = int((time_val % 86400) // 3600)
-        time_scaled   = (time_val - 94811.07759952) / 47480.96421642
-        amount_scaled = scaler.transform([[amount]])[0][0]
+        hour        = int((time_val % 86400) // 3600)
+        time_scaled = (time_val - 94811.07759952) / 47480.96421642
+
+        # Use pre-scaled amount if a sample is loaded, otherwise scale raw amount
+        if defaults is not None and "amount_scaled" in defaults:
+            amount_scaled = defaults["amount_scaled"]
+        else:
+            amount_scaled = scaler.transform([[amount]])[0][0]
 
         features = np.array([[
             v1, v2, v3, v4, v5, v6, v7, v8, v9, v10,
