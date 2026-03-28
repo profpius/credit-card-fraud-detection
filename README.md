@@ -295,12 +295,12 @@ Use **Kernel → Restart & Run All** to execute the complete pipeline end-to-end
 
 ## 🚀 Future Improvements
 
-- **[✅] Streamlit deployment** - Live app deployed on Streamlit Community Cloud
 - **[ ] Cost-sensitive threshold optimisation** - Replace the fixed threshold with a mathematically optimal value derived from explicit false negative / false positive cost estimates
 - **[ ] LightGBM / CatBoost comparison** - Benchmark against faster gradient boosting alternatives for latency-sensitive production environments
 - **[ ] Concept drift monitoring** - Implement a monitoring layer that tracks fraud recall over rolling windows and triggers automated retraining when performance degrades
 - **[ ] Raw feature access** - If non-anonymised transaction data becomes available, retrain without PCA to enable direct business interpretation of model decisions
 - **[ ] Dockerised deployment** - Containerise the scoring API for consistent, reproducible production deployments
+- **[ ] Per-transaction SHAP in batch mode** - Allow users to select a flagged transaction from batch results and view its individual SHAP waterfall explanation
 
 ---
 
